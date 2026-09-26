@@ -1,0 +1,195 @@
+/* =========================================================================
+   WINDRUNNER '86 — TAILOR'S BENCH DESIGN SYSTEM
+   Sample-room cutting table under tungsten lamp meets '80s athletics
+   ========================================================================= */
+
+:root {
+  --bg-primary:      #141312;
+  --bg-secondary:    #1B1917;
+  --bg-surface:      #22201D;
+
+  --text-primary:    rgba(255, 255, 255, 0.95);
+  --text-muted:      rgba(255, 255, 255, 0.55);
+  --text-dim:        rgba(255, 255, 255, 0.35);
+
+  --accent-red:      #D5222B;
+  --accent-black:    #111111;
+  --accent-offwhite: #F1EDE6;
+
+  --trim-nickel:     #9A9C9E;
+  --trim-graphite:   #3E3F41;
+
+  --chalk-line:      rgba(241, 237, 230, 0.65);
+  --thread-gold:     #D9A84E;
+
+  --font-headline:   'Bebas Neue', 'Impact', sans-serif;
+  --font-script:     'Kalam', cursive;
+  --font-body:       'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:       'Space Mono', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.auth-screen input:focus {
+  border-color: var(--accent-red);
+  box-shadow: 0 0 0 2px rgba(213, 34, 43, 0.18);
+}
+
+@media (max-width: 760px) {
+  .auth-screen {
+    display: block !important;
+  }
+
+  .auth-screen .auth-visual {
+    min-height: 250px !important;
+    padding: 1.5rem !important;
+  }
+
+  .auth-screen .auth-visual h1 {
+    font-size: 3.4rem !important;
+  }
+}
+
+::selection {
+  background: var(--accent-red);
+  color: var(--accent-offwhite);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track  { background: #141312; }
+::-webkit-scrollbar-thumb  { background: #2a2724; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #3e3a35; }
+
+/* ── Typography helpers ── */
+.font-headline {
+  font-family: var(--font-headline);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.font-script { font-family: var(--font-script); }
+.font-mono   { font-family: var(--font-mono); }
+.font-body   { font-family: var(--font-body); }
+
+/* Rubber-stamped tabular numeral with ink bleed */
+.stamped-numeral {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-offwhite);
+  filter: drop-shadow(0 0 1px rgba(241, 237, 230, 0.45));
+}
+
+/* Generic spec-sheet badge pill */
+.spec-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-offwhite);
+}
+
+/* ── Chalk-line draw-in nav link hover ── */
+.chalk-link {
+  position: relative;
+  text-decoration: none;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+  padding-bottom: 2px;
+}
+
+.chalk-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0%;
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(241, 237, 230, 0.8) 0px,
+    rgba(241, 237, 230, 0.8) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.chalk-link:hover,
+.chalk-link:focus { color: var(--accent-offwhite); outline: none; }
+.chalk-link:hover::after { width: 100%; }
+
+.chalk-link.active { color: var(--accent-offwhite); }
+.chalk-link.active::after {
+  width: 100%;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--accent-red) 0px,
+    var(--accent-red) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* ── Texture helpers ── */
+
+/* Diagonal twill weave for woven labels */
+.woven-twill-texture {
+  background-color: #121214;
+  background-image:
+    repeating-linear-gradient(45deg,  rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 3px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,0.4)         0px, rgba(0,0,0,0.4)         1px, transparent 1px, transparent 3px);
+}
+
+/* Ripstop grid */
+.ripstop-texture {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+/* Open-pore mesh */
+.mesh-lining-texture {
+  background-image: radial-gradient(rgba(255,255,255,0.18) 1.2px, transparent 1.2px);
+  background-size: 6px 6px;
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes stitchRun {
+  to { stroke-dashoffset: -60; }
+}
