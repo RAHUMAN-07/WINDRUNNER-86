@@ -35,6 +35,7 @@ const refreshCookie = 'wr86_refresh';
 const csrfCookie = 'wr86_csrf';
 const rateBuckets = new Map();
 const rateLimit = (windowMs, max) => (req, res, next) => {
+  if (!isProduction) return next();
   const key = `${req.ip}:${req.path}`;
   const now = Date.now();
   const bucket = rateBuckets.get(key);
@@ -303,8 +304,8 @@ app.patch('/api/admin/products/:id', authMiddleware, requireRole('admin'), (req,
 app.post('/api/auth/register', rateLimit(15 * 60 * 1000, 5), async (req, res) => {
   const { name, email, password, phone, address } = req.body;
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
-  if (typeof name !== 'string' || name.length < 1 || name.length > 100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || typeof password !== 'string' || password.length < 12 || password.length > 128) {
-    return res.status(400).json({ error: 'Use a valid name, email, and password of 12–128 characters' });
+  if (typeof name !== 'string' || name.length < 1 || name.length > 100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || typeof password !== 'string' || password.length < 8 || password.length > 128) {
+    return res.status(400).json({ error: 'Use a valid name, email, and password of at least 8 characters' });
   }
   const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(normalizedEmail);
   if (exists) return res.status(409).json({ error: 'Email already registered' });
@@ -359,7 +360,7 @@ app.post('/api/auth/password-reset/request', rateLimit(15 * 60 * 1000, 5), async
 
 app.post('/api/auth/password-reset/complete', rateLimit(15 * 60 * 1000, 10), (req, res) => {
   const { token, password } = req.body;
-  if (typeof token !== 'string' || typeof password !== 'string' || password.length < 12 || password.length > 128) return res.status(400).json({ error: 'Invalid reset request' });
+  if (typeof token !== 'string' || typeof password !== 'string' || password.length < 8 || password.length > 128) return res.status(400).json({ error: 'Invalid reset request. Password must be at least 8 characters.' });
   const stored = db.prepare(`SELECT * FROM account_tokens WHERE token_hash = ? AND type = 'reset_password' AND used_at IS NULL AND expires_at > CURRENT_TIMESTAMP`).get(hashToken(token));
   if (!stored) return res.status(400).json({ error: 'Reset link is invalid or expired' });
   db.transaction(() => {

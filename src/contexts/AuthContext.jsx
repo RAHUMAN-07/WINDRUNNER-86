@@ -3,8 +3,20 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 const AuthContext = createContext(null);
 
 async function readResponse(response) {
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || 'Request failed');
+  let data = {};
+  try {
+    data = await response.json();
+  } catch (_) {
+    if (!response.ok) {
+      if (response.status === 500 || response.status === 502 || response.status === 503 || response.status === 504) {
+        throw new Error('Backend server is unreachable (port 4000). Please make sure the backend server is running.');
+      }
+      throw new Error(`Server returned error status ${response.status}`);
+    }
+  }
+  if (!response.ok) {
+    throw new Error(data.error || data.message || `Request failed (${response.status})`);
+  }
   return data;
 }
 
@@ -46,27 +58,41 @@ export function AuthProvider({ children }) {
   }, []);
 
   const register = async form => {
-    const response = await fetch('/api/auth/register', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-    const data = await readResponse(response);
-    setUser(await loadUser() || data.user);
-    await refreshCsrf();
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await readResponse(response);
+      setUser(await loadUser() || data.user);
+      await refreshCsrf();
+    } catch (err) {
+      if (err.name === 'TypeError' && err.message?.toLowerCase().includes('fetch')) {
+        throw new Error('Cannot connect to server. Please verify backend is running on port 4000.');
+      }
+      throw err;
+    }
   };
 
   const login = async (email, password) => {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await readResponse(response);
-    setUser(await loadUser() || data.user);
-    await refreshCsrf();
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await readResponse(response);
+      setUser(await loadUser() || data.user);
+      await refreshCsrf();
+    } catch (err) {
+      if (err.name === 'TypeError' && err.message?.toLowerCase().includes('fetch')) {
+        throw new Error('Cannot connect to server. Please verify backend is running on port 4000.');
+      }
+      throw err;
+    }
   };
 
   const updateProfile = async form => {
