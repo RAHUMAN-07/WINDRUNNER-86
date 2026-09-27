@@ -3,7 +3,9 @@ const path = require('node:path');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 
-const DB_PATH = path.join(__dirname, 'store.db');
+// DB_PATH env var lets Railway point to a persistent volume (e.g. /data/store.db)
+// Falls back to ./server/store.db locally
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'store.db');
 const db = new Database(DB_PATH);
 
 // Enable WAL mode for better concurrent performance
