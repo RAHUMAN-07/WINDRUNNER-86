@@ -165,6 +165,41 @@ function authMiddleware(req, res, next) {
   }
 }
 
+// ─── Root Status Page ────────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WINDRUNNER '86 API Server</title>
+  <style>
+    body { background: #141312; color: #f1ede6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .box { background: rgba(255,255,255,0.04); border: 1px solid rgba(241,237,230,0.15); border-radius: 8px; padding: 2.5rem; max-width: 520px; text-align: center; }
+    h1 { color: #d5222b; margin: 0 0 0.5rem; font-size: 1.8rem; letter-spacing: 0.05em; }
+    p { color: rgba(241,237,230,0.8); line-height: 1.6; font-size: 0.95rem; }
+    .badge { display: inline-block; background: rgba(64, 145, 108, 0.2); color: #52b788; border: 1px solid #40916c; padding: 0.3rem 0.8rem; border-radius: 999px; font-weight: bold; font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .btn { display: inline-block; background: #d5222b; color: #fff; padding: 0.75rem 1.4rem; text-decoration: none; font-weight: bold; border-radius: 4px; margin: 0.4rem; font-size: 0.9rem; }
+    .btn-outline { background: transparent; border: 1px solid rgba(241,237,230,0.3); color: #f1ede6; }
+    .btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>WINDRUNNER '86</h1>
+    <div class="badge">● BACKEND API &amp; DATABASE ONLINE</div>
+    <p>This is the Express &amp; SQLite backend API server (Port 4000).</p>
+    <p>To browse and interact with the store, open the React frontend:</p>
+    <div style="margin-top: 1.5rem;">
+      <a class="btn" href="http://localhost:3000">Open Store Frontend (Port 3000)</a>
+      <br/>
+      <a class="btn btn-outline" href="/api/products">View Products API</a>
+      <a class="btn btn-outline" href="/api/health">API Health Check</a>
+    </div>
+  </div>
+</body>
+</html>`);
+});
+
 // ─── Health ──────────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', store: "WINDRUNNER '86", owner: 'Abdul Rahuman', location: 'Thuvarankurichy, Trichy dist-621314, India' });
