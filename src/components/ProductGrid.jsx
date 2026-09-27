@@ -6,7 +6,7 @@ export default function ProductGrid() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://127.0.0.1:4000/api/products')
+    fetch('/api/products')
       .then(res => res.json())
       .then(setProducts)
       .catch(err => console.error('Failed to load products', err));

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
-export default function Checkout({ cartItems, total }) {
+export default function Checkout({ total = 0 }) {
   const [shipping, setShipping] = useState({ name: '', address: '', city: '', pin: '', phone: '' });
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { csrfToken } = useAuth();
+  const { placeOrder } = useCart();
 
   const handleChange = (e) => {
     setShipping({ ...shipping, [e.target.name]: e.target.value });
@@ -16,23 +17,15 @@ export default function Checkout({ cartItems, total }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
-        body: JSON.stringify({ shipping, payment_method: paymentMethod, guest_email: 'rahumanabdul0306@gmail.com' })
-      });
-      const data = await res.json();
-      if (res.ok) {
+      const data = await placeOrder(shipping, paymentMethod);
+      if (data?.order?.id) {
         navigate(`/order/${data.order.id}`);
-      } else {
-        console.error('Order error', data);
-        alert('Failed to place order');
       }
     } catch (err) {
-      console.error(err);
-      alert('Network error');
+      console.error('Order error', err);
+      setError(err.message || 'Failed to place order');
     } finally {
       setLoading(false);
     }
@@ -54,6 +47,11 @@ export default function Checkout({ cartItems, total }) {
           <option value="netbanking">Net Banking</option>
           <option value="wallet">Digital Wallet</option>
         </select>
+        {error && (
+          <div style={{ color: '#ff6b6b', background: 'rgba(213,34,43,0.15)', border: '1px solid #d5222b', padding: '0.6rem', marginBottom: '0.8rem', fontSize: '0.85rem' }}>
+            {error}
+          </div>
+        )}
         <button type="submit" disabled={loading} style={buttonStyle}>
           {loading ? 'Placing…' : `Pay ₹${total.toFixed(2)}`}
         </button>
