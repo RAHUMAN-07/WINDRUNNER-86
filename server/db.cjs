@@ -1,4 +1,46 @@
-const Database = require('better-sqlite3');
+let Database;
+try {
+  Database = require('better-sqlite3');
+} catch {
+  const { DatabaseSync } = require('node:sqlite');
+  Database = class {
+    constructor(filename) {
+      this.connection = new DatabaseSync(filename);
+    }
+
+    pragma(statement) {
+      this.connection.exec(`PRAGMA ${statement}`);
+    }
+
+    exec(statement) {
+      this.connection.exec(statement);
+    }
+
+    prepare(statement) {
+      const prepared = this.connection.prepare(statement);
+      return {
+        all: (...parameters) => prepared.all(...parameters),
+        get: (...parameters) => prepared.get(...parameters),
+        run: (...parameters) => prepared.run(...parameters),
+      };
+    }
+
+    transaction(callback) {
+      return (...parameters) => {
+        this.connection.exec('BEGIN');
+        try {
+          const result = callback(...parameters);
+          this.connection.exec('COMMIT');
+          return result;
+        } catch (error) {
+          this.connection.exec('ROLLBACK');
+          throw error;
+        }
+      };
+    }
+  };
+  console.warn('better-sqlite3 could not be loaded; using Node built-in SQLite.');
+}
 const path = require('node:path');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');

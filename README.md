@@ -41,6 +41,8 @@ An editorial e-commerce and interactive archival experience celebrating the icon
 - **Payments**: Razorpay Node SDK
 - **Security & Utilities**: JWT (`jsonwebtoken`), `bcryptjs`, `cors`, `uuid`, `nodemailer`
 
+For local development, if the `better-sqlite3` native binding is unavailable, the API falls back to Node.js's built-in SQLite driver (Node.js 22.12 or newer).
+
 ---
 
 ## 🚀 Getting Started
@@ -99,6 +101,21 @@ To build the static frontend for deployment:
 npm run build
 npm run preview
 ```
+
+### 6. Deploying the API to Railway
+
+Set the Railway service root to this project directory and use `npm start` as the start command. Railway must use Node.js 22.12 or newer. Configure these service variables:
+
+```env
+NODE_ENV=production
+JWT_SECRET=<a random secret at least 32 characters long>
+DB_PATH=/data/store.db
+CORS_ORIGINS=<your deployed frontend origin, without a trailing slash>
+```
+
+Attach a Railway volume mounted at `/data` to persist SQLite data across deploys. Add the frontend's public origin to `CORS_ORIGINS`; use a comma-separated list if there is more than one. Optional integrations such as Razorpay and SMTP can be configured with the variables in `.env.example`.
+
+After deploy, check `https://<your-railway-domain>/api/health`. Railway hosts the API only; deploy the Vite frontend separately and point its `/api` requests to the Railway service.
 
 ---
 
